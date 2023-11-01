@@ -138,6 +138,7 @@ func (s *Supervisor) worker() {
 					})
 				}
 
+				// If the status code is 500, also change the message visibility so that it will be retried. Use a visibility timeout of 5 seconds.
 				if res.StatusCode == http.StatusInternalServerError {
 					changeVisibilityEntries = append(changeVisibilityEntries, &sqs.ChangeMessageVisibilityBatchRequestEntry{
 						Id:                msg.MessageId,
