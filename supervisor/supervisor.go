@@ -138,6 +138,15 @@ func (s *Supervisor) worker() {
 					})
 				}
 
+				// If the status code is 500, also change the message visibility so that it will be retried. Use a visibility timeout of 5 seconds.
+				if res.StatusCode == http.StatusInternalServerError {
+					changeVisibilityEntries = append(changeVisibilityEntries, &sqs.ChangeMessageVisibilityBatchRequestEntry{
+						Id:                msg.MessageId,
+						ReceiptHandle:     msg.ReceiptHandle,
+						VisibilityTimeout: aws.Int64(5),
+					})
+				}
+
 				s.logger.Errorf("Non-successful status code: %d", res.StatusCode)
 
 				continue
@@ -212,6 +221,7 @@ func (s *Supervisor) httpRequest(msg *sqs.Message) (*http.Response, error) {
 		req.Header.Set("User-Agent", s.workerConfig.UserAgent)
 	}
 
+	// COSA
 	res, err := s.httpClient.Do(req)
 	if err != nil {
 		return res, err

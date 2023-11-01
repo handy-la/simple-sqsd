@@ -117,16 +117,22 @@ func main() {
 
 	if len(c.HTTPHealthPath) != 0 {
 		numSuccesses := 0
-		healthURL := fmt.Sprintf("%s%s", c.HTTPURL, c.HTTPHealthPath)
+		healthURL := fmt.Sprintf("%s", c.HTTPHealthPath)
 		log.Infof("Waiting %d seconds before staring health check at '%s'", c.HTTPHealthWait, healthURL)
 		time.Sleep(time.Duration(c.HTTPHealthWait) * time.Second)
 		for {
 			if resp, err := http.Get(healthURL); err == nil {
-				log.Infof("%#v", resp)
-				if numSuccesses == c.HTTPHealthSucessCount {
-					break
+				defer resp.Body.Close()
+				if resp.StatusCode != http.StatusOK {
+					log.Debugf("Health check failed with status code: %d. Waiting for %d seconds before next attempt", resp.StatusCode, c.HTTPHealthInterval)
+					time.Sleep(time.Duration(c.HTTPHealthInterval) * time.Second)
 				} else {
-					numSuccesses++
+					log.Infof("%#v", resp)
+					if numSuccesses == c.HTTPHealthSucessCount {
+						break
+					} else {
+						numSuccesses++
+					}
 				}
 			} else {
 				log.Debugf("Health check failed: %s. Waiting for %d seconds before next attempt", err, c.HTTPHealthInterval)
