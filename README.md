@@ -1,8 +1,8 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/fterrag/simple-sqsd)](https://goreportcard.com/report/github.com/fterrag/simple-sqsd)
-
 # simple-sqsd
 
 A simple version of the AWS Elastic Beanstalk Worker Environment SQS daemon ([sqsd](https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features-managing-env-tiers.html#worker-daemon)).
+
+This version has been customized for Handy.
 
 ## Getting Started
 
@@ -42,27 +42,3 @@ $ docker run -e AWS_ACCESS_KEY_ID=your-access-id -e AWS_SECRET_ACCESS_KEY=your-s
 |`SQSD_CRON_FILE`||no|The elastic beanstalk cron.yaml file to load|
 |`SQSD_CRON_ENDPOINT`|`SQSD_HTTP_URL` without path/query|yes if SQSD_CRON_FILE|The base URL to call (e.g. http://localhost:3000). cron.yaml url will be appended to this|
 |`SQSD_CRON_TIMEOUT`|`15`|no|Duration (in seconds) To wait for the cron endpoint to response|
-
-## HMAC
-
-*Optionally* (when SQSD_HTTP_HMAC_HEADER and SQSD_HMAC_SECRET_KEY are set), HMAC hashes are generated using SHA-256 with the signature made up of the following:
-```
-POST {SQSD_HTTP_URL}\n
-<SQS message body>
-```
-
-## Support 429 Status codes with Retry-After
-
-* SQSD will attempt to change the message visibility when the service responds with [429 status code](https://tools.ietf.org/html/rfc6585#section-4).
-* `Retry-After` response header should contain an integer with the amount of senconds to wait.
-
-## Todo
-- [ ] More Tests
-- [ ] Documentation
-
-## Contributing
-
-* Submit a PR
-* Add or improve documentation
-* Report issues
-* Suggest new features or enhancements

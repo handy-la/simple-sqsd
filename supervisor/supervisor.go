@@ -81,7 +81,7 @@ func (s *Supervisor) Wait() {
 func (s *Supervisor) Shutdown() {
 	defer s.Unlock()
 	s.Lock()
-
+	s.logger.Info("Shutting down supervisor")
 	s.shutdown = true
 }
 
